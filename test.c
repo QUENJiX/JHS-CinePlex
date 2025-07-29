@@ -1,7 +1,5 @@
 #include <stdio.h>
 
 int main(){
-
-    system("cls");
-    return 0;
+    FILE* f = fopen("movies.txt", "w");
 }
