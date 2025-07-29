@@ -9,7 +9,7 @@ struct Movie{
 
 struct Showtime{
     char time[100];
-    float price;
+    int price;
     int available_Seats;
 };
 
@@ -17,22 +17,23 @@ struct Ticket {
     char movie_Title[200];
     char show_Time[50];
     int ticket_Count;
-    float total_Amount;
+    int total_Amount;
 };
 
 void Main_Menue();
 void View_Avaliable_Movies();
-//void Purchase_Tickets();
+void Purchase_Tickets();
 //void View_My_Purchases();
 void Movie_Information();
-void Save_Movie_to_File();
-void Show_Movie_Information();
+void Write_Movie_to_File();
+void Read_Movie_Information();
 void Press_Enter_to_Continue();
 
 struct Movie m[100];
 struct Showtime s[100];
 
 int main(){
+    Read_Movie_Information();
 
     int choice;
     while(1){
@@ -74,19 +75,6 @@ void Main_Menue(){
     printf("4. Exit\n");
 }
 
-void View_Avaliable_Movies(){
-    system("cls");
-    printf("\nAvaialbe Movies\n");
-
-    for(int i = 0; i < 5; i++){
-        printf("Movie %d: %s (%s)\n", i+1, m[i].title, m[i].genre);
-        printf("\tShowtimes:\n");
-        printf("\t%s - Price: %f - Seats Available: %d\n", s[50].time, s->price, s->available_Seats);
-    }
-    
-    Press_Enter_to_Continue();
-}
-
 void Movie_Information(){
 
     strcpy(m[0].title, "Heridetary");
@@ -121,21 +109,90 @@ void Movie_Information(){
 
 }
 
-void Show_Movie_Information(){
+void Read_Movie_Information(){
     FILE *file = fopen("movie_list.txt", "r");
 
-    
+    if (file == NULL) {
+        Movie_Information();
+        Write_Movie_to_File();
+    }else {
+        for(int i = 0; i < 5; i++){
+            fscanf(file, "%[^\n]", m[i].title);
+            fscanf(file, "%[^\n]", m[i].genre);
+            fscanf(file, "%s %d %d", s[i].time, s[i].price, s[i].available_Seats);
+        }
+        fclose(file);
+    }
 }
 
-void Save_Movie_to_File(){
+void Write_Movie_to_File(){
     FILE *file = fopen("movie_list.txt", "w");
 
+    if(file == NULL){
+        printf("Error!\n");
+        return;
+    }
     for(int i = 0; i < 5; i++){
         fprintf(file, "%s\n", m[i].title);
         fprintf(file, "%s\n", m[i].genre);
-        fprintf(file, "%s %2.f %d\n", s[i].time, s[i].price, s[i].available_Seats);
+        fprintf(file, "%s\n", s[i].time); 
+        fprintf(file, "%d\n", s[i].price); 
+        fprintf(file, "%d\n", s[i].available_Seats); 
     }
     fclose(file);
+}
+
+void View_Avaliable_Movies(){
+    system("cls");
+    printf("\nAvaialbe Movies\n");
+
+    for(int i = 0; i < 5; i++){
+        printf("Movie %d: %s (%s)\n", i+1, m[i].title, m[i].genre);
+        printf("\tShowtimes: %s\n", s[i].time);
+        printf("\tPrice: %d\n", s[i].price);
+        printf("\tSeats Available: %d\n\n", s[i].available_Seats);
+    }
+    Press_Enter_to_Continue();
+}
+
+void Purchase_Tickets(){
+    system("cls");
+    int movie_choice, ticket_count;
+    
+    printf("Purchase Tickets\n");
+
+    for(int i = 0; i < 5; i++){
+        printf("%d. %s (%s)\n", i+1, m[i].title, m[i].genre);
+    }
+    printf("Enter movie number: ");
+    scanf("%d", &movie_choice);
+    while (getchar() != '\n');
+
+    //Edge case
+
+    int movie_position = movie_choice - 1;
+
+    printf("\nSelected Movie: %s\n", m[movie_position].title);
+    printf("\nShowtime: %s\n", s[movie_position].time);
+    printf("\nPrice: %d\n", s[movie_position].price);
+    printf("\nAvailable Seats: %d\n", s[movie_position].available_Seats);
+
+    printf("Enter number of tickets to buy: ");
+    scanf("%d", &ticket_count);
+    while (getchar() != '\n');
+
+    //Edge case
+
+    int total_price = ticket_count * s[movie_position].price; 
+
+    printf("\n\nPurchase Successful\n");
+    printf("Movie: %s", m[movie_position].title);
+    printf("Tickets: %d", ticket_count);
+    printf("Total Price: %d", total_price);
+
+    s[movie_position].available_Seats -= ticket_count;
+    //continue tomorrow
+    
 }
 
 void Press_Enter_to_Continue(){
