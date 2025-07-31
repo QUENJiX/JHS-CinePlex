@@ -21,14 +21,14 @@ struct Ticket {
 };
 
 void Main_Menue();
+void View_Avaliable_Movies();
+void Purchase_Tickets();
+void View_My_Purchases();
 void Movie_Information();
 void Write_Movie_to_File();
 void Read_Movie_Information();
-void View_Avaliable_Movies();
 void Write_User_Purchases();
 void Read_User_Purchases();
-void Purchase_Tickets();
-void View_My_Purchases();
 void Press_Enter_to_Continue();
 
 struct Movie m[100];
@@ -89,7 +89,7 @@ void Main_Menue(){
 
 void Movie_Information(){
 
-    strcpy(m[0].title, "Heridetary"); 
+    strcpy(m[0].title, "Hereditary"); 
     strcpy(m[0].genre, "Horror");
     strcpy(s[0].time,  "11:00 PM - 01:20 PM"); 
     s[0].price = 200; s[0].available_Seats = 45;
@@ -123,6 +123,7 @@ void Read_Movie_Information(){
         Movie_Information();
         Write_Movie_to_File();
     }else {
+        //probable problematic code block
         for (int i = 0; i < 5; i++) {
             fscanf(file, "%[^\n]", m[i].title);
             fgetc(file); 
@@ -163,6 +164,7 @@ void Read_User_Purchases(){
         return;
     }else {
         ticket_count = 0;
+        //probable problematic code block
         while (fscanf(file, "%[^\n]", t[ticket_count].movie_Title) != NULL) {
             fgetc(file); 
             fscanf(file, "%[^\n]", t[ticket_count].show_Time);
@@ -178,17 +180,17 @@ void Read_User_Purchases(){
 }
 
 void Write_User_Purchases(){
-    FILE *file = fopen("movie_list.txt", "w");
+    FILE *file = fopen("tickets.txt", "w");
 
     if (file == NULL) {
         printf("Error! Could not save purchase history\n");
         return;
     }
     for (int i = 0; i < ticket_count; i++) {
-        fprintf(file, "%s\n", m[i].title);
-        fprintf(file, "%s\n", s[i].time);
-        fprintf(file, "%d\n", s[i].price);
-        fprintf(file, "%d\n", s[i].available_Seats);
+        fprintf(file, "%s\n", t[i].movie_Title);
+        fprintf(file, "%s\n", t[i].show_Time);
+        fprintf(file, "%d\n", t[i].quantity);
+        fprintf(file, "%d\n", t[i].total_Amount);
     }
     fclose(file);
 }
@@ -206,7 +208,7 @@ void View_Avaliable_Movies(){
         if(s[i].available_Seats > 0){
             printf("Seats Available: %d\n", s[i].available_Seats);
         }else{
-            printf("Seats: Avaialble: SOLD OUT\n");
+            printf("Seats Avaialble: SOLD OUT\n");
         }
         printf("\n");
         if(i < 4){
@@ -227,7 +229,7 @@ void Purchase_Tickets(){
     for(int i = 0; i < 5; i++){
         printf("%d. %s\n", i+1, m[i].title);
     }
-    printf("\n 0. Back to Main Menu\n");
+    printf("\n0. Back to Main Menu\n");
     
     printf("=======================================\n");
     printf("Enter movie number: ");
@@ -260,7 +262,7 @@ void Purchase_Tickets(){
     while (getchar() != '\n');
 
     if(ticket_quantity <= 0) {
-        printf("\nInvalid Choice. Please choose options from 1-5 only.\n");
+        printf("\nPlease choose atlest 1 quantity!\n");
         Press_Enter_to_Continue();
         return;
     }
@@ -283,6 +285,8 @@ void Purchase_Tickets(){
     t[ticket_count].quantity = ticket_quantity;
     t[ticket_count].total_Amount = total_price;
     ticket_count++;
+
+    printf("\nEnjoy your movie!\n");
     Press_Enter_to_Continue();
 }
 
@@ -301,7 +305,7 @@ void View_My_Purchases(){
             printf("Movie: %s\n", t[i].movie_Title);
             printf("Showtime: %s:\n", t[i].show_Time);
             printf("Quantity: %d\n", t[i].quantity);
-            printf("Total Amount:%d\n", t[i].total_Amount);
+            printf("Total Amount: %d\n", t[i].total_Amount);
             grand_total += t[i].total_Amount;
         }
         printf("\n-----------------------------------------");
