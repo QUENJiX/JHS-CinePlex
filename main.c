@@ -123,18 +123,13 @@ void Read_Movie_Information(){
         Movie_Information();
         Write_Movie_to_File();
     }else {
-        //probable problematic code block
+        char buffer[256];
         for (int i = 0; i < 5; i++) {
-            fscanf(file, "%[^\n]", m[i].title);
-            fgetc(file); 
-            fscanf(file, "%[^\n]", m[i].genre);
-            fgetc(file); 
-            fscanf(file, "%[^\n]", s[i].time);
-            fgetc(file); 
-            fscanf(file, "%d", &s[i].price);
-            fgetc(file); 
-            fscanf(file, "%d", &s[i].available_Seats);
-            fgetc(file); 
+            fgets(m[i].title, 200, file); strtok(m[i].title, "\n");
+            fgets(m[i].genre, 100, file); strtok(m[i].genre, "\n");
+            fgets(s[i].time, 100, file); strtok(s[i].time, "\n");
+            fgets(buffer, sizeof(buffer), file); sscanf(buffer, "%d", &s[i].price);
+            fgets(buffer, sizeof(buffer), file); sscanf(buffer, "%d", &s[i].available_Seats);
         }
         fclose(file);
     }
@@ -162,21 +157,24 @@ void Read_User_Purchases(){
 
     if (file == NULL) {
         return;
-    }else {
-        ticket_count = 0;
-        //probable problematic code block
-        while (fscanf(file, "%[^\n]", t[ticket_count].movie_Title) != NULL) {
-            fgetc(file); 
-            fscanf(file, "%[^\n]", t[ticket_count].show_Time);
-            fgetc(file); 
-            fscanf(file, "%d", &t[ticket_count].quantity);
-            fgetc(file); 
-            fscanf(file, "%d", &t[ticket_count].total_Amount);
-            fgetc(file); 
-            ticket_count++;
-        }
-        fclose(file);
     }
+    char buffer[256];
+    ticket_count = 0;
+    while(fgets(t[ticket_count].movie_Title, 200, file) != NULL) {
+        strtok(t[ticket_count].movie_Title, "\n");
+        
+        fgets(t[ticket_count].show_Time, 50, file);
+        strtok(t[ticket_count].show_Time, "\n");
+        
+        fgets(buffer, sizeof(buffer), file);
+        sscanf(buffer, "%d", &t[ticket_count].quantity);
+        
+        fgets(buffer, sizeof(buffer), file);
+        sscanf(buffer, "%d", &t[ticket_count].total_Amount);
+        
+        ticket_count++;
+    }
+        fclose(file);
 }
 
 void Write_User_Purchases(){
@@ -292,25 +290,27 @@ void Purchase_Tickets(){
 
 void View_My_Purchases(){
     system("cls");
-    printf("All Purchase History\n");
+    printf("\n=======================================\n");
+    printf("         All Purchase History");
+    printf("\n=======================================\n");
 
     if(ticket_count == 0){
         printf("No purchase has been made yet.\n");
     }else{
         int grand_total = 0;
         for(int i = 0; i < ticket_count; i++){
-            printf("\n=======================================\n");
+            printf("\n---------------------------------------\n");
             printf("            Ticket - %d:\n", i+1);
-            printf("=======================================\n");
+            printf("---------------------------------------\n");
             printf("Movie: %s\n", t[i].movie_Title);
             printf("Showtime: %s:\n", t[i].show_Time);
             printf("Quantity: %d\n", t[i].quantity);
             printf("Total Amount: %d\n", t[i].total_Amount);
             grand_total += t[i].total_Amount;
         }
-        printf("\n-----------------------------------------");
+        printf("\n========================================");
         printf("\nTotal Amount Spent in JHS-CinePlex: %d\n", grand_total);
-        printf("-----------------------------------------\n");
+        printf("========================================\n");
     }
     Press_Enter_to_Continue();
 }
