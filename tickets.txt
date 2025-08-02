@@ -1,8 +1,12 @@
 Hereditary
 11:00 PM - 01:20 PM
-3
-600
+5
+1000
+Boss Baby
+03:00 PM - 05:00 PM
+10
+2000
 Chander Pahar
 01:00 PM - 03:30 PM
-10
-5000
+2
+1000
