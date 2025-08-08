@@ -1,18 +1,18 @@
 Hereditary
 Horror
-11:00 PM - 01:20 PM
+11:00 PM - 01:20 AM
 200
-40
+27
 The Notebook
 Romantic
 08:30 PM - 10:10 PM
 200
-0
+7
 Boss Baby
 Family / Comedy
 03:00 PM - 05:00 PM
 200
-25
+50
 Harry Potter and the Goblet of Fire
 Fantasy
 05:00 PM - 08:00 PM
@@ -22,4 +22,4 @@ Chander Pahar
 Adventure
 01:00 PM - 03:30 PM
 500
-48
+50
