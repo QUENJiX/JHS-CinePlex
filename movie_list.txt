@@ -7,13 +7,13 @@ The Notebook
 Romantic
 08:30 PM - 10:10 PM
 200
-5
+10
 Boss Baby
-Family / Comedy
+Comedy
 03:00 PM - 05:00 PM
 200
-50
-Harry Potter and the Goblet of Fire
+39
+Harry Potter
 Fantasy
 05:00 PM - 08:00 PM
 500
@@ -22,4 +22,4 @@ Chander Pahar
 Adventure
 01:00 PM - 03:30 PM
 500
-50
+49

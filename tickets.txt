@@ -2,11 +2,23 @@ Hereditary
 11:00 PM - 01:20 AM
 5
 1000
-Username
+User1
 2025-08-10
-The Notebook
-08:30 PM - 10:10 PM
-5
-1000
-Username
+Chander Pahar
+01:00 PM - 03:30 PM
+1
+500
+User2
+2025-08-10
+Boss Baby
+03:00 PM - 05:00 PM
+1
+200
+User2
+2025-08-10
+Boss Baby
+03:00 PM - 05:00 PM
+10
+2000
+User2
 2025-08-10
