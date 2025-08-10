@@ -25,20 +25,11 @@ void press_enter_to_continue() {
     getchar();
 }
 
-void print_header(const char* title) {
-    int width = 80;
-    int title_len = (int)strlen(title);
-    int padding = (width - title_len) / 2;
-    printf(COLOR_CYAN);
-    for (int i = 0; i < width; ++i) putchar('=');
-    printf("\n");
-    for (int i = 0; i < padding; ++i) putchar(' ');
-    printf("%s\n", title);
-    for (int i = 0; i < width; ++i) putchar('=');
-    printf("\n" COLOR_RESET);
+void print_success(const char* msg) { 
+    printf(COLOR_GREEN "[SUCCESS] %s" COLOR_RESET "\n", msg); 
 }
 
-void print_success(const char* msg) { printf(COLOR_GREEN "[SUCCESS] %s" COLOR_RESET "\n", msg); }
+
 void print_error(const char* msg) { printf(COLOR_RED "[ERROR] %s" COLOR_RESET "\n", msg); }
 void print_info(const char* msg) { printf(COLOR_YELLOW "[INFO] %s" COLOR_RESET "\n", msg); }
 
@@ -63,10 +54,6 @@ void Read_Users();
 void Write_Users();
 void Default_Movies();
 
-int get_menu_choice(int min, int max, int allow_zero);
-int confirm_prompt(const char* msg);
-void show_admin_dashboard();
-int find_movie_by_title_substr(const char* query);
 void admin_panel();
 void admin_add_movie();
 void admin_edit_movie();
@@ -88,13 +75,24 @@ int main() {
 
     while (1) {
         clear_screen();
-        print_header("JHS-CinePlex - Management & Booking");
+        printf("====================== JHS-CinePlex - Management & Booking ======================\n\n");
         printf("   " COLOR_MAGENTA "[1]" COLOR_RESET " Admin Login\n");
         printf("   " COLOR_MAGENTA "[2]" COLOR_RESET " Customer Login / Register\n");
         printf("   " COLOR_MAGENTA "[3]" COLOR_RESET " Exit\n\n");
         printf(">> Enter your choice: ");
 
-        int ch = get_menu_choice(1, 3, 0);
+        int ch = -1;
+        char line[128];
+        if (fgets(line, sizeof(line), stdin)) {
+            if (sscanf(line, "%d", &ch) != 1) ch = -1;
+        }
+
+        if (ch < 1 || ch > 3) { 
+            print_error("Invalid choice."); 
+            press_enter_to_continue(); 
+            continue; 
+        }
+
         switch (ch) {
             case 1: admin_panel(); break;
             case 2: user_portal(); break;
@@ -109,79 +107,17 @@ int main() {
     return 0;
 }
 
-int get_menu_choice(int min, int max, int allow_zero) {
-    int choice;
-    char line[128];
-    if (!fgets(line, sizeof(line), stdin)) return 0;
-    if (sscanf(line, "%d", &choice) != 1) return -1;
-    if (allow_zero && choice == 0) return 0;
-    if (choice < min || choice > max) return -1;
-    return choice;
-}
-
-int confirm_prompt(const char* msg) {
-    printf("%s (Y/N): ", msg);
-    char line[8];
-    if (!fgets(line, sizeof(line), stdin)) return 0;
-    return (toupper((unsigned char)line[0]) == 'Y');
-}
-
-void show_admin_dashboard() {
-    clear_screen();
-    print_header("Admin Dashboard");
-
-    int tickets_sold = 0, revenue = 0;
-    for (int i = 0; i < purchase_count; ++i) {
-        tickets_sold += all_purchases[i].ticket_Count;
-        revenue += all_purchases[i].total_Amount;
-    }
-
-    printf(COLOR_BOLD "  Total Movies:   " COLOR_RESET "%d\n", movie_count);
-    printf(COLOR_BOLD "  Tickets Sold:   " COLOR_RESET "%d\n", tickets_sold);
-    printf(COLOR_BOLD "  Total Revenue:  " COLOR_RESET "BDT %d\n\n", revenue);
-    printf(COLOR_YELLOW "  Recent Purchases:\n" COLOR_RESET);
-
-    if (purchase_count == 0) {
-        printf("   (none yet)\n");
-    } else {
-        int start = (purchase_count >= 5) ? purchase_count - 5 : 0;
-        for (int i = purchase_count - 1; i >= start; --i) {
-            printf("   %s | %-20.20s | %2d tickets | %d by %s\n",
-                   all_purchases[i].purchase_Date, all_purchases[i].movie_Title,
-                   all_purchases[i].ticket_Count, all_purchases[i].total_Amount, all_purchases[i].username);
-        }
-    }
-    printf("\n");
-}
-
-int find_movie_by_title_substr(const char* query) {
-    if (!query || !*query) return -1;
-    char qlower[200];
-    strncpy(qlower, query, sizeof(qlower) - 1);
-    qlower[sizeof(qlower) - 1] = '\0';
-    for (int i = 0; qlower[i]; ++i) qlower[i] = tolower((unsigned char)qlower[i]);
-
-    for (int i = 0; i < movie_count; ++i) {
-        char tlower[200];
-        strncpy(tlower, m[i].title, sizeof(tlower) - 1);
-        tlower[sizeof(tlower) - 1] = '\0';
-        for (int j = 0; tlower[j]; ++j) tlower[j] = tolower((unsigned char)tlower[j]);
-        if (strstr(tlower, qlower) != NULL) return i;
-    }
-    return -1;
-}
-
 void admin_panel() {
     char username[50], password[50];
     clear_screen();
-    print_header("Admin Login");
+    printf("================================== Admin Login ==================================\n\n");
     printf("\nEnter Admin Username: ");
     if (!fgets(username, sizeof(username), stdin)) return;
-    username[strcspn(username, "\n")] = 0;
+    whilr(getchar()!='\n');
 
     printf("Enter Admin Password: ");
     if (!fgets(password, sizeof(password), stdin)) return;
-    password[strcspn(password, "\n")] = 0;
+    while(getchar()!='\n');
 
     if (!((strcmp(username, "Hasib") == 0 && strcmp(password, "hasib123") == 0) ||
           (strcmp(username, "Jaima") == 0 && strcmp(password, "jaima123") == 0) ||
@@ -195,7 +131,17 @@ void admin_panel() {
     press_enter_to_continue();
 
     while (1) {
-        show_admin_dashboard();
+        clear_screen();
+        printf("================================ Admin Dashboard ================================\n\n");
+        int tickets_sold = 0, revenue = 0;
+        for (int i = 0; i < purchase_count; ++i) {
+            tickets_sold += all_purchases[i].ticket_Count;
+            revenue += all_purchases[i].total_Amount;
+        }
+        printf(COLOR_BOLD "  Total Movies:   " COLOR_RESET "%d\n", movie_count);
+        printf(COLOR_BOLD "  Tickets Sold:   " COLOR_RESET "%d\n", tickets_sold);
+        printf(COLOR_BOLD "  Total Revenue:  " COLOR_RESET "BDT %d\n\n", revenue);
+
         printf("   " COLOR_MAGENTA "[1]" COLOR_RESET " Add New Movie\n");
         printf("   " COLOR_MAGENTA "[2]" COLOR_RESET " Edit Movie\n");
         printf("   " COLOR_MAGENTA "[3]" COLOR_RESET " Remove Movie\n");
@@ -204,7 +150,13 @@ void admin_panel() {
         printf("   " COLOR_MAGENTA "[6]" COLOR_RESET " Logout\n\n");
         printf(">> Enter your choice: ");
 
-        int ch = get_menu_choice(1, 6, 0);
+        int ch = -1;
+        char line[128];
+        if (fgets(line, sizeof(line), stdin)) {
+            if (sscanf(line, "%d", &ch) != 1) ch = -1;
+        }
+        if (ch < 1 || ch > 6) { print_error("Invalid choice."); press_enter_to_continue(); continue; }
+
         switch (ch) {
             case 1: admin_add_movie(); break;
             case 2: admin_edit_movie(); break;
@@ -218,10 +170,10 @@ void admin_panel() {
 
 void admin_add_movie() {
     clear_screen();
-    print_header("[+] Add New Movie");
+    printf("================================ [+] Add New Movie ================================\n\n");
     if (movie_count >= MAX_MOVIES) {
-        print_error("Movie list is full.");
-        press_enter_to_continue();
+        printf("[ERROR] Movie list is full.\n");
+        printf("\nPress Enter to continue..."); getchar();
         return;
     }
 
@@ -249,27 +201,38 @@ void admin_add_movie() {
 
     movie_count++;
     Write_Movies();
-    print_success("Movie added successfully!");
-    press_enter_to_continue();
+    printf("[SUCCESS] Movie added successfully!\n");
+    printf("\nPress Enter to continue..."); getchar();
 }
 
 void admin_edit_movie() {
     clear_screen();
-    print_header("~ Edit Movie");
-    if (movie_count == 0) { print_info("No movies to edit."); press_enter_to_continue(); return; }
+    printf("================================= ~ Edit Movie =================================\n\n");
+    if (movie_count == 0) {
+        printf("[INFO] No movies to edit.\n");
+        printf("\nPress Enter to continue..."); getchar();
+        return;
+    }
 
-    printf("Enter a title (or part) to search (0 to cancel): ");
-    char query[200];
-    if (!fgets(query, sizeof(query), stdin)) return;
-    query[strcspn(query, "\n")] = 0;
-    if (strcmp(query, "0") == 0) return;
+    printf("Select a movie to edit:\n");
+    for (int i = 0; i < movie_count; ++i) {
+        printf("   [%d] %s\n", i + 1, m[i].title);
+    }
+    printf("\n   [0] Back\n");
+    printf("\n>> Enter movie number: ");
 
-    int idx = find_movie_by_title_substr(query);
-    if (idx == -1) { print_error("Movie not found."); press_enter_to_continue(); return; }
+    int choice = -1;
+    char line[128];
+    if (fgets(line, sizeof(line), stdin)) {
+        if (sscanf(line, "%d", &choice) != 1) choice = -1;
+    }
+    if (choice < 0 || choice > movie_count) return;
+    if (choice == 0) return;
+    int idx = choice - 1;
 
     printf("\nFound: %s (%s)\n", m[idx].title, m[idx].genre);
     printf("Showtime: %s | Price: %d | Seats: %d\n\n", s[idx].time, s[idx].price, s[idx].available_Seats);
-    printf("Press Enter to keep current value.\n");
+    printf("Press Enter to keep current value.\n\n");
 
     char buffer[256];
     printf("New Title: ");
@@ -284,41 +247,55 @@ void admin_edit_movie() {
     if (fgets(buffer, sizeof(buffer), stdin) && buffer[0] != '\n') { s[idx].available_Seats = atoi(buffer); }
 
     Write_Movies();
-    print_success("Movie updated.");
-    press_enter_to_continue();
+    printf("[SUCCESS] Movie updated.\n");
+    printf("\nPress Enter to continue..."); getchar();
 }
 
 void admin_remove_movie() {
     clear_screen();
-    print_header("[-] Remove Movie");
-    if (movie_count == 0) { print_info("No movies to remove."); press_enter_to_continue(); return; }
+    printf("=============================== [-] Remove Movie ===============================\n\n");
+    if (movie_count == 0) {
+        printf("[INFO] No movies to remove.\n");
+        printf("\nPress Enter to continue..."); getchar();
+        return;
+    }
 
-    printf("Enter a title (or part) to search (0 to cancel): ");
-    char query[200];
-    if (!fgets(query, sizeof(query), stdin)) return;
-    query[strcspn(query, "\n")] = 0;
-    if (strcmp(query, "0") == 0) return;
+    printf("Select a movie to remove:\n");
+    for (int i = 0; i < movie_count; ++i) {
+        printf("   [%d] %s\n", i + 1, m[i].title);
+    }
+    printf("\n   [0] Back\n");
+    printf("\n>> Enter movie number: ");
 
-    int idx = find_movie_by_title_substr(query);
-    if (idx == -1) { print_error("Movie not found."); press_enter_to_continue(); return; }
+    int choice = -1;
+    char line[128];
+    if (fgets(line, sizeof(line), stdin)) {
+        if (sscanf(line, "%d", &choice) != 1) choice = -1;
+    }
+    if (choice < 0 || choice > movie_count) return;
+    if (choice == 0) return;
+    int idx = choice - 1;
 
-    printf("\nFound: %s (%s) - Seats: %d - Price: %d\n", m[idx].title, m[idx].genre, s[idx].available_Seats, s[idx].price);
-    if (!confirm_prompt("Confirm removal?")) {
-        print_info("Removal cancelled.");
-        press_enter_to_continue();
+    printf("\nSelected: %s (%s)\n", m[idx].title, m[idx].genre);
+    printf("Confirm removal? (Y/N): ");
+    if (!fgets(line, sizeof(line), stdin)) return;
+
+    if (toupper((unsigned char)line[0]) != 'Y') {
+        printf("[INFO] Removal cancelled.\n");
+        printf("\nPress Enter to continue..."); getchar();
         return;
     }
 
     for (int i = idx; i < movie_count - 1; ++i) { m[i] = m[i+1]; s[i] = s[i+1]; }
     movie_count--;
     Write_Movies();
-    print_success("Movie removed.");
-    press_enter_to_continue();
+    printf("[SUCCESS] Movie removed.\n");
+    printf("\nPress Enter to continue..."); getchar();
 }
 
 void view_all_purchases() {
     clear_screen();
-    print_header("All Purchase History");
+    printf("============================= All Purchase History =============================\n\n");
     if (purchase_count == 0) { print_info("No purchases yet."); press_enter_to_continue(); return; }
 
     printf("%-5s %-12s %-20s %-8s %-8s %-10s\n", "ID", "Date", "Movie", "Tickets", "Amount", "User");
@@ -334,12 +311,19 @@ void view_all_purchases() {
 void user_portal() {
     while (1) {
         clear_screen();
-        print_header("Customer Portal");
+        printf("================================ Customer Portal ================================\n\n");
         printf("   " COLOR_MAGENTA "[1]" COLOR_RESET " Login\n");
         printf("   " COLOR_MAGENTA "[2]" COLOR_RESET " Register\n");
         printf("   " COLOR_MAGENTA "[3]" COLOR_RESET " Back\n\n");
         printf(">> Enter your choice: ");
-        int ch = get_menu_choice(1, 3, 3);
+
+        int ch = -1;
+        char line[128];
+        if (fgets(line, sizeof(line), stdin)) {
+            if (sscanf(line, "%d", &ch) != 1) ch = -1;
+        }
+        if (ch < 0 || ch > 3) { print_error("Invalid choice."); press_enter_to_continue(); continue; }
+
         switch (ch) {
             case 1: {
                 char current_user[50];
@@ -348,6 +332,7 @@ void user_portal() {
             }
             case 2: user_register(); break;
             case 3: return;
+            default: break;
         }
     }
 }
@@ -355,7 +340,7 @@ void user_portal() {
 int user_login(char* username_buffer) {
     char username[50], password[50];
     clear_screen();
-    print_header("Customer Login");
+    printf("================================ Customer Login ================================\n\n");
     printf("\nEnter Username: ");
     if (!fgets(username, sizeof(username), stdin)) return 0;
     username[strcspn(username, "\n")] = 0;
@@ -380,7 +365,7 @@ int user_login(char* username_buffer) {
 void user_register() {
     char username[50], password[50];
     clear_screen();
-    print_header("New User Registration");
+    printf("============================ New User Registration =============================\n\n");
     printf("\nEnter a new username (0 to cancel): ");
     if (!fgets(username, sizeof(username), stdin)) return;
     username[strcspn(username, "\n")] = 0;
@@ -410,14 +395,20 @@ void user_menu(const char* username) {
     while (1) {
         clear_screen();
         char title[100];
-        snprintf(title, sizeof(title), "Welcome, %s!", username);
-        print_header(title);
+        printf("============================== Welcome, %s! ================================\n\n", username);
         printf("   " COLOR_MAGENTA "[1]" COLOR_RESET " View Available Movies\n");
         printf("   " COLOR_MAGENTA "[2]" COLOR_RESET " Purchase Tickets\n");
         printf("   " COLOR_MAGENTA "[3]" COLOR_RESET " View My Purchases\n");
         printf("   " COLOR_MAGENTA "[4]" COLOR_RESET " Logout\n\n");
         printf(">> Enter your choice: ");
-        int ch = get_menu_choice(1, 4, 0);
+
+        int ch = -1;
+        char line[128];
+        if (fgets(line, sizeof(line), stdin)) {
+            if (sscanf(line, "%d", &ch) != 1) ch = -1;
+        }
+        if (ch < 1 || ch > 4) { print_error("Invalid choice."); press_enter_to_continue(); continue; }
+
         switch (ch) {
             case 1: view_available_movies(); break;
             case 2: purchase_tickets(username); break;
@@ -429,8 +420,8 @@ void user_menu(const char* username) {
 
 void view_available_movies() {
     clear_screen();
-    print_header("Available Movies");
-    printf(COLOR_BOLD "%-4s %-30s %-18s %-8s %-8s\n" COLOR_RESET, "No.", "Title", "Genre", "Price", "Seats");
+    printf("=============================== Available Movies ================================\n\n");
+    printf("%-4s %-30s %-18s %-8s %-8s\n", "No.", "Title", "Genre", "Price", "Seats");
     printf("----------------------------------------------------------------------------\n");
     if (movie_count == 0) {
         print_info("No movies available.");
@@ -449,23 +440,29 @@ void view_available_movies() {
 
 void purchase_tickets(const char* current_username) {
     clear_screen();
-    print_header("Purchase Tickets");
+    printf("=============================== Purchase Tickets ================================\n\n");
     if (movie_count == 0) { print_info("No movies available."); press_enter_to_continue(); return; }
 
     for (int i = 0; i < movie_count; ++i) printf("   [%d] %s (%s) - Seats: %d\n", i + 1, m[i].title, m[i].genre, s[i].available_Seats);
     printf("\n   [0] Back\n");
     printf("\n>> Enter movie number: ");
 
-    int choice = get_menu_choice(0, movie_count, 1);
+    int choice = -1;
+    char line[128];
+    if (fgets(line, sizeof(line), stdin)) {
+        if (sscanf(line, "%d", &choice) != 1) choice = -1;
+    }
     if (choice == 0) return;
+    if (choice < 1 || choice > movie_count) { print_error("Invalid choice."); press_enter_to_continue(); return; }
+
     int index = choice - 1;
     if (s[index].available_Seats == 0) { print_error("Sorry, this movie is SOLD OUT."); press_enter_to_continue(); return; }
 
     printf("\nSelected: '%s' | Available Seats: %d\n", m[index].title, s[index].available_Seats);
     printf(">> Enter number of tickets to buy: ");
-    char line[64];
-    if (!fgets(line, sizeof(line), stdin)) return;
-    int ticket_count = atoi(line);
+    char l2[64];
+    if (!fgets(l2, sizeof(l2), stdin)) return;
+    int ticket_count = atoi(l2);
 
     if (ticket_count <= 0 || ticket_count > s[index].available_Seats) { print_error("Invalid ticket count."); press_enter_to_continue(); return; }
 
@@ -477,7 +474,9 @@ void purchase_tickets(const char* current_username) {
     printf("   Total:   BDT %d\n", total_price);
     printf("------------------------\n");
 
-    if (!confirm_prompt("Confirm purchase?")) { print_info("Purchase cancelled."); press_enter_to_continue(); return; }
+    printf("Confirm purchase? (Y/N): ");
+    if (!fgets(line, sizeof(line), stdin)) return;
+    if (toupper((unsigned char)line[0]) != 'Y') { print_info("Purchase cancelled."); press_enter_to_continue(); return; }
 
     s[index].available_Seats -= ticket_count;
     strncpy(all_purchases[purchase_count].movie_Title, m[index].title, sizeof(all_purchases[purchase_count].movie_Title)-1);
@@ -492,7 +491,6 @@ void purchase_tickets(const char* current_username) {
     Write_Tickets(); Write_Movies();
 
     clear_screen();
-    print_header("Ticket Receipt");
     printf("+-----------------------------------------------+\n");
     printf("|            JHS-CinePlex Ticket                |\n");
     printf("+-----------------------------------------------+\n");
@@ -510,7 +508,7 @@ void view_my_purchases(const char* current_username) {
     clear_screen();
     char title[120];
     snprintf(title, sizeof(title), "Purchase History for %s", current_username);
-    print_header(title);
+    printf("======================== Purchase History for %-25s ========================\n\n", current_username);
     int cnt = 0, total_spent = 0;
 
     printf("%-12s %-30s %-8s %-8s\n", "Date", "Movie Title", "Tickets", "Amount");
@@ -538,10 +536,10 @@ void Read_Movies() {
     movie_count = 0;
     while(movie_count < MAX_MOVIES && fgets(m[movie_count].title, sizeof(m[0].title), file)) {
         strtok(m[movie_count].title, "\n");
-        fgets(m[movie_count].genre, sizeof(m[0].genre), file); strtok(m[movie_count].genre, "\n");
-        fgets(s[movie_count].time, sizeof(s[0].time), file); strtok(s[movie_count].time, "\n");
-        fgets(buffer, sizeof(buffer), file); sscanf(buffer, "%d", &s[movie_count].price);
-        fgets(buffer, sizeof(buffer), file); sscanf(buffer, "%d", &s[movie_count].available_Seats);
+        if (!fgets(m[movie_count].genre, sizeof(m[0].genre), file)) break; strtok(m[movie_count].genre, "\n");
+        if (!fgets(s[movie_count].time, sizeof(s[0].time), file)) break; strtok(s[movie_count].time, "\n");
+        if (!fgets(buffer, sizeof(buffer), file)) break; s[movie_count].price = atoi(buffer);
+        if (!fgets(buffer, sizeof(buffer), file)) break; s[movie_count].available_Seats = atoi(buffer);
         movie_count++;
     }
     fclose(file);
@@ -561,11 +559,11 @@ void Read_Tickets() {
     purchase_count = 0;
     while (purchase_count < MAX_PURCHASES && fgets(all_purchases[purchase_count].movie_Title, sizeof(all_purchases[0].movie_Title), file)) {
         strtok(all_purchases[purchase_count].movie_Title, "\n");
-        fgets(all_purchases[purchase_count].show_Time, sizeof(all_purchases[0].show_Time), file); strtok(all_purchases[purchase_count].show_Time, "\n");
-        fgets(buffer, sizeof(buffer), file); sscanf(buffer, "%d", &all_purchases[purchase_count].ticket_Count);
-        fgets(buffer, sizeof(buffer), file); sscanf(buffer, "%d", &all_purchases[purchase_count].total_Amount);
-        fgets(all_purchases[purchase_count].username, sizeof(all_purchases[0].username), file); strtok(all_purchases[purchase_count].username, "\n");
-        fgets(all_purchases[purchase_count].purchase_Date, sizeof(all_purchases[0].purchase_Date), file); strtok(all_purchases[purchase_count].purchase_Date, "\n");
+        if (!fgets(all_purchases[purchase_count].show_Time, sizeof(all_purchases[0].show_Time), file)) break; strtok(all_purchases[purchase_count].show_Time, "\n");
+        if (!fgets(buffer, sizeof(buffer), file)) break; all_purchases[purchase_count].ticket_Count = atoi(buffer);
+        if (!fgets(buffer, sizeof(buffer), file)) break; all_purchases[purchase_count].total_Amount = atoi(buffer);
+        if (!fgets(all_purchases[purchase_count].username, sizeof(all_purchases[0].username), file)) break; strtok(all_purchases[purchase_count].username, "\n");
+        if (!fgets(all_purchases[purchase_count].purchase_Date, sizeof(all_purchases[0].purchase_Date), file)) break; strtok(all_purchases[purchase_count].purchase_Date, "\n");
         purchase_count++;
     }
     fclose(file);

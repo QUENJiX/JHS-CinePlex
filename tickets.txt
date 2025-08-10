@@ -1,12 +1,12 @@
-The Notebook
-08:30 PM - 10:10 PM
-3
-600
-c
-2025-08-08
 Hereditary
 11:00 PM - 01:20 AM
-23
-4600
-c
-2025-08-08
+5
+1000
+Username
+2025-08-10
+The Notebook
+08:30 PM - 10:10 PM
+5
+1000
+Username
+2025-08-10
