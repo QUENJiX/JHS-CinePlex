@@ -49,10 +49,10 @@ void view_all_purchases();
 void user_portal();
 int user_login(char* username_buffer);
 void user_register();
-void user_menu(const char* username);
+void user_menu(char* username);
 void view_available_movies();
-void purchase_tickets(const char* username);
-void view_my_purchases(const char* username);
+void purchase_tickets(char* username);
+void view_my_purchases(char* username);
 
 int main() {
     Read_Users();
@@ -299,10 +299,10 @@ void view_all_purchases() {
         return; 
     }
     printf(COLOR_BOLD "--------------------------------------------------------------------------------\n" COLOR_RESET);
-    printf(COLOR_CYAN COLOR_BOLD "%-5s %-12s %-25s %-8s %-10s %-15s\n" COLOR_RESET, "ID", "Date", "Movie", "Tickets", "Amount", "User");
+    printf(COLOR_CYAN COLOR_BOLD "%-5s %-12s %-25s %-10s %-12s %-15s\n" COLOR_RESET, "ID", "Date", "Movie", "Tickets", "Amount", "User");
     printf(COLOR_BOLD "--------------------------------------------------------------------------------\n" COLOR_RESET);
     for (int i = 0; i < purchase_count; ++i) {
-        printf(COLOR_MAGENTA "#%-4d" COLOR_RESET "%-12s %-25.25s %-8d BDT %-6d %-15.15s\n",
+        printf(COLOR_MAGENTA "#%-5d" COLOR_RESET "%-12s %-25.25s %-10d BDT %-8d %-15.15s\n",
                i+1, all_purchases[i].purchase_Date, all_purchases[i].movie_Title,
                all_purchases[i].ticket_Count, all_purchases[i].total_Amount, all_purchases[i].username);
     }
@@ -401,7 +401,7 @@ void user_register() {
     press_enter_to_continue();
 }
 
-void user_menu(const char* username) {
+void user_menu(char* username) {
     while (1) {
         system("cls");
         printf(COLOR_YELLOW COLOR_BOLD "============================== Welcome, %s! ================================" COLOR_RESET "\n\n", username);
@@ -438,7 +438,7 @@ void view_available_movies() {
         printf(COLOR_YELLOW "\n[INFO] Sorry, there are no movies available at the moment.\n" COLOR_RESET);
     } else {
         for (int i = 0; i < movie_count; ++i) {
-            printf(COLOR_MAGENTA COLOR_BOLD "%-4d" COLOR_RESET "%-30.30s %-20.20s " COLOR_YELLOW "BDT %-5d " COLOR_RESET, i+1, m[i].title, m[i].genre, s[i].price);
+            printf(COLOR_MAGENTA COLOR_BOLD "%-5d" COLOR_RESET "%-30.30s %-20.20s "COLOR_YELLOW "BDT %-8d "COLOR_RESET, i+1, m[i].title, m[i].genre, s[i].price);
             if (s[i].available_Seats > 10) {
                 printf(COLOR_GREEN "%-10d\n" COLOR_RESET, s[i].available_Seats);
             } else if (s[i].available_Seats > 0) {
@@ -452,7 +452,7 @@ void view_available_movies() {
     press_enter_to_continue();
 }
 
-void purchase_tickets(const char* current_username) {
+void purchase_tickets(char* current_username) {
     system("cls");
     printf(COLOR_YELLOW COLOR_BOLD "=============================== Purchase Tickets ================================" COLOR_RESET "\n\n");
     if (movie_count == 0) { 
@@ -551,11 +551,10 @@ void purchase_tickets(const char* current_username) {
     printf(COLOR_CYAN " ----------------------------------------------- \n" COLOR_RESET);
     
     purchase_count++; 
-    
     press_enter_to_continue();
 }
 
-void view_my_purchases(const char* current_username) {
+void view_my_purchases(char* current_username) {
     system("cls");
     printf(COLOR_YELLOW COLOR_BOLD "========================= Purchase History for %s =========================" COLOR_RESET "\n\n", current_username);
     int cnt = 0, total_spent = 0;

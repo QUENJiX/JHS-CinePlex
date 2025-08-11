@@ -2,23 +2,17 @@ Hereditary
 11:00 PM - 01:20 AM
 5
 1000
-User1
-2025-08-10
+user1
+2025-08-11
 Chander Pahar
 01:00 PM - 03:30 PM
 1
 500
-User2
-2025-08-10
+user2
+2025-08-11
 Boss Baby
 03:00 PM - 05:00 PM
-1
-200
-User2
-2025-08-10
-Boss Baby
-03:00 PM - 05:00 PM
-10
-2000
-User2
-2025-08-10
+3
+600
+user1
+2025-08-11
