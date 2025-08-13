@@ -17,8 +17,6 @@
 #define MAX_PURCHASES 500
 #define MAX_USERS 200
 
-void press_enter_to_continue() {printf(COLOR_CYAN "\nPress Enter to continue..." COLOR_RESET); getchar();}
-
 struct Movie { char title[200]; char genre[100]; };
 struct Showtime { char time[100]; int price; int available_Seats; };    
 struct Ticket { char movie_Title[200]; char show_Time[50]; int ticket_Count; int total_Amount; char username[50]; char purchase_Date[20]; };
@@ -54,6 +52,8 @@ void view_available_movies();
 void purchase_tickets(char* username);
 void view_my_purchases(char* username);
 
+void press_enter_to_continue() {printf(COLOR_CYAN "\nPress Enter to continue..." COLOR_RESET); getchar();}
+
 int main() {
     Read_Users();
     Read_Movies();
@@ -68,9 +68,7 @@ int main() {
         printf(COLOR_CYAN ">> Enter your choice: " COLOR_RESET);
 
         int choice;
-        if (scanf("%d", &choice) != 1) {
-            choice = 0; 
-        }
+        scanf("%d", &choice); 
         while (getchar() != '\n'); 
 
         switch (choice) {
@@ -97,11 +95,11 @@ void admin_panel() {
     printf(COLOR_YELLOW COLOR_BOLD "================================== Admin Login ==================================" COLOR_RESET "\n\n");
     
     printf(COLOR_CYAN "Enter Admin Username: " COLOR_RESET);
-    if (!fgets(username, sizeof(username), stdin)) return;
+    fgets(username, sizeof(username), stdin);
     username[strcspn(username, "\n")] = 0;
 
     printf(COLOR_CYAN "Enter Admin Password: " COLOR_RESET);
-    if (!fgets(password, sizeof(password), stdin)) return;
+    fgets(password, sizeof(password), stdin);
     password[strcspn(password, "\n")] = 0; 
 
     if (!((strcmp(username, "Hasib") == 0 && strcmp(password, "hasib123") == 0) ||
@@ -271,7 +269,7 @@ void admin_remove_movie() {
     char ch;
     printf("\n" COLOR_YELLOW "Selected Movie: %s (%s)" COLOR_RESET "\n", m[idx].title, m[idx].genre);
     printf(COLOR_RED COLOR_BOLD "Confirm removal? This action cannot be undone. (Y/N): " COLOR_RESET);
-    scanf(" %c", &choice);
+    scanf(" %c", &ch);
     while (getchar() != '\n');
 
     if (toupper(ch) != 'Y') {
@@ -345,11 +343,11 @@ int user_login(char* username_buffer) {
     printf(COLOR_YELLOW COLOR_BOLD "================================ Customer Login ================================" COLOR_RESET "\n\n");
     
     printf(COLOR_CYAN "Enter Username: " COLOR_RESET);
-    if (!fgets(username, sizeof(username), stdin)) return 0;
+    fgets(username, sizeof(username), stdin);
     username[strcspn(username, "\n")] = 0;
 
     printf(COLOR_CYAN "Enter Password: " COLOR_RESET);
-    if (!fgets(password, sizeof(password), stdin)) return 0;
+    fgets(password, sizeof(password), stdin);
     password[strcspn(password, "\n")] = 0;
 
     for (int i = 0; i < user_count; ++i) {
@@ -369,10 +367,9 @@ void user_register() {
     char username[50], password[50];
     system("cls");
     printf(COLOR_YELLOW COLOR_BOLD "============================ New User Registration =============================" COLOR_RESET "\n\n");
-    
     printf(COLOR_CYAN "Enter a new username (" COLOR_YELLOW "0 to cancel" COLOR_CYAN "): " COLOR_RESET);
-    if (!fgets(username, sizeof(username), stdin)) return;
-    username[strcspn(username, "\n")] = 0;
+    fgets(username, sizeof(username), stdin);
+    username[strcspn(username, "\n")] = '\0';
     if (strcmp(username, "0") == 0) return;
 
     for (int i = 0; i < user_count; ++i) {
@@ -384,8 +381,8 @@ void user_register() {
     }
 
     printf(COLOR_CYAN "Enter a new password: " COLOR_RESET);
-    if (!fgets(password, sizeof(password), stdin)) return;
-    password[strcspn(password, "\n")] = 0;
+    fgets(password, sizeof(password), stdin);
+    password[strcspn(password, "\n")] = '\0';
 
     if (user_count >= MAX_USERS) {
         printf(COLOR_RED "\n[ERROR] Maximum user limit reached. Cannot register new user." COLOR_RESET "\n");
@@ -393,8 +390,8 @@ void user_register() {
         return;
     }
 
-    strncpy(all_users[user_count].username, username, sizeof(all_users[user_count].username)-1);
-    strncpy(all_users[user_count].password, password, sizeof(all_users[user_count].password)-1);
+    strcpy(all_users[user_count].username, username);
+    strcpy(all_users[user_count].password, password);
     user_count++;
     Write_Users();
     printf(COLOR_GREEN "\n[SUCCESS] Registration successful! You can now log in with your new account." COLOR_RESET "\n");
@@ -412,7 +409,7 @@ void user_menu(char* username) {
         printf(COLOR_CYAN ">> Enter your choice: " COLOR_RESET);
 
         int choice;
-        if (scanf("%d", &choice) != 1) choice = 0;
+        scanf("%d", &choice);
         while (getchar() != '\n');
 
         switch (choice){
@@ -437,6 +434,7 @@ void view_available_movies() {
     if (movie_count == 0) {
         printf(COLOR_YELLOW "\n[INFO] Sorry, there are no movies available at the moment.\n" COLOR_RESET);
     } else {
+
         for (int i = 0; i < movie_count; ++i) {
             printf(COLOR_MAGENTA COLOR_BOLD "%-5d" COLOR_RESET "%-30.30s %-20.20s "COLOR_YELLOW "BDT %-8d "COLOR_RESET, i+1, m[i].title, m[i].genre, s[i].price);
             if (s[i].available_Seats > 10) {
@@ -585,12 +583,12 @@ void Read_Movies() {
     movie_count = 0;
     while(movie_count < MAX_MOVIES && fgets(m[movie_count].title, sizeof(m[0].title), file)) {
         m[movie_count].title[strcspn(m[movie_count].title, "\n")] = 0;
-        if (!fgets(m[movie_count].genre, sizeof(m[0].genre), file)) break; 
+        fgets(m[movie_count].genre, sizeof(m[0].genre), file);
         m[movie_count].genre[strcspn(m[movie_count].genre, "\n")] = 0;
-        if (!fgets(s[movie_count].time, sizeof(s[0].time), file)) break; 
+        fgets(s[movie_count].time, sizeof(s[0].time), file);
         s[movie_count].time[strcspn(s[movie_count].time, "\n")] = 0;
-        if (!fgets(buffer, sizeof(buffer), file)) break; s[movie_count].price = atoi(buffer);
-        if (!fgets(buffer, sizeof(buffer), file)) break; s[movie_count].available_Seats = atoi(buffer);
+        fgets(buffer, sizeof(buffer), file); s[movie_count].price = atoi(buffer);
+        fgets(buffer, sizeof(buffer), file); s[movie_count].available_Seats = atoi(buffer);
         movie_count++;
     }
     fclose(file);
@@ -612,13 +610,13 @@ void Read_Tickets() {
     purchase_count = 0;
     while (purchase_count < MAX_PURCHASES && fgets(all_purchases[purchase_count].movie_Title, sizeof(all_purchases[0].movie_Title), file)) {
         all_purchases[purchase_count].movie_Title[strcspn(all_purchases[purchase_count].movie_Title, "\n")] = 0;
-        if (!fgets(all_purchases[purchase_count].show_Time, sizeof(all_purchases[0].show_Time), file)) break; 
+        fgets(all_purchases[purchase_count].show_Time, sizeof(all_purchases[0].show_Time), file);
         all_purchases[purchase_count].show_Time[strcspn(all_purchases[purchase_count].show_Time, "\n")] = 0;
-        if (!fgets(buffer, sizeof(buffer), file)) break; all_purchases[purchase_count].ticket_Count = atoi(buffer);
-        if (!fgets(buffer, sizeof(buffer), file)) break; all_purchases[purchase_count].total_Amount = atoi(buffer);
-        if (!fgets(all_purchases[purchase_count].username, sizeof(all_purchases[0].username), file)) break; 
+        fgets(buffer, sizeof(buffer), file); all_purchases[purchase_count].ticket_Count = atoi(buffer);
+        fgets(buffer, sizeof(buffer), file); all_purchases[purchase_count].total_Amount = atoi(buffer);
+        fgets(all_purchases[purchase_count].username, sizeof(all_purchases[0].username), file);
         all_purchases[purchase_count].username[strcspn(all_purchases[purchase_count].username, "\n")] = 0;
-        if (!fgets(all_purchases[purchase_count].purchase_Date, sizeof(all_purchases[0].purchase_Date), file)) break; 
+        fgets(all_purchases[purchase_count].purchase_Date, sizeof(all_purchases[0].purchase_Date), file);
         all_purchases[purchase_count].purchase_Date[strcspn(all_purchases[purchase_count].purchase_Date, "\n")] = 0;
         purchase_count++;
     }
